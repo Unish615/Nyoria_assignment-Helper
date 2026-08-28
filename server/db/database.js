@@ -7,18 +7,23 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const dataDir = path.join(__dirname, '..', 'data');
+// On Vercel / serverless, filesystem is read-only except /tmp
+const isVercel = process.env.VERCEL || process.env.NODE_ENV === 'production';
+const dataDir = process.env.DATABASE_DIR || (isVercel ? '/tmp' : path.join(__dirname, '..', 'data'));
+
 if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
+  try {
+    fs.mkdirSync(dataDir, { recursive: true });
+  } catch (e) {
+    console.warn('Could not create data dir:', e);
+  }
 }
 
 const dbPath = path.join(dataDir, 'nyora.db');
 const rawDb = new sqlite3.Database(dbPath);
 
-// Enable foreign keys
 rawDb.run('PRAGMA foreign_keys = ON');
 
-// Synchronous wrapper interface for sqlite3
 class SQLiteWrapper {
   exec(sql) {
     return new Promise((resolve, reject) => {
@@ -61,10 +66,12 @@ class SQLiteWrapper {
 
 const db = new SQLiteWrapper();
 
+let isInitialized = false;
+
 export async function initDatabase() {
+  if (isInitialized) return;
   console.log('Initializing Nyora Database at:', dbPath);
 
-  // Users Table
   await db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
@@ -80,7 +87,6 @@ export async function initDatabase() {
     );
   `);
 
-  // Assignments Table
   await db.exec(`
     CREATE TABLE IF NOT EXISTS assignments (
       id TEXT PRIMARY KEY,
@@ -99,7 +105,6 @@ export async function initDatabase() {
     );
   `);
 
-  // Samples Table
   await db.exec(`
     CREATE TABLE IF NOT EXISTS samples (
       id TEXT PRIMARY KEY,
@@ -114,7 +119,6 @@ export async function initDatabase() {
     );
   `);
 
-  // Question Sets Table
   await db.exec(`
     CREATE TABLE IF NOT EXISTS question_sets (
       id TEXT PRIMARY KEY,
@@ -132,7 +136,6 @@ export async function initDatabase() {
     );
   `);
 
-  // Verification Tokens Table
   await db.exec(`
     CREATE TABLE IF NOT EXISTS verification_tokens (
       token TEXT PRIMARY KEY,
@@ -143,7 +146,6 @@ export async function initDatabase() {
     );
   `);
 
-  // Password Reset Tokens Table
   await db.exec(`
     CREATE TABLE IF NOT EXISTS password_reset_tokens (
       token TEXT PRIMARY KEY,
@@ -155,7 +157,6 @@ export async function initDatabase() {
     );
   `);
 
-  // Dev Email Logs Table
   await db.exec(`
     CREATE TABLE IF NOT EXISTS dev_email_logs (
       id TEXT PRIMARY KEY,
@@ -168,7 +169,6 @@ export async function initDatabase() {
     );
   `);
 
-  // Seed Admin user if not exists
   const existingAdmin = await db.prepare(`SELECT * FROM users WHERE email = ?`).get('admin@nyora.edu');
   if (!existingAdmin) {
     const adminId = 'usr_admin_' + Math.random().toString(36).substr(2, 9);
@@ -193,6 +193,7 @@ export async function initDatabase() {
     console.log('Seeded initial admin user: admin@nyora.edu');
   }
 
+  isInitialized = true;
   console.log('Database initialized successfully.');
 }
 
