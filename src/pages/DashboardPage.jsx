@@ -69,7 +69,7 @@ export const DashboardPage = () => {
               </span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-outfit">
-              Welcome, <span className="gradient-text">{user?.full_name}</span>
+              Welcome, <span className="gradient-text">{user?.full_name || 'Unish Gautam'}</span>
             </h1>
             <p className="mt-2 text-slate-400 text-sm max-w-2xl leading-relaxed">
               Your intelligent academic workspace. Generate assignments, upload study samples, build question sets, and elevate your grades.

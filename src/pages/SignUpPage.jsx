@@ -159,7 +159,7 @@ export const SignUpPage = () => {
                     name="full_name"
                     value={formData.full_name}
                     onChange={handleChange}
-                    placeholder="Jane Doe"
+                    placeholder="Unish Gautam"
                     required
                     className="w-full bg-slate-900/90 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-nyora-500 focus:ring-1 focus:ring-nyora-500 transition-all"
                   />

@@ -180,7 +180,7 @@ export async function initDatabase() {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       adminId,
-      'Nyora System Administrator',
+      'Unish Gautam',
       'admin@nyora.edu',
       passHash,
       'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
@@ -191,6 +191,8 @@ export async function initDatabase() {
       now
     );
     console.log('Seeded initial admin user: admin@nyora.edu');
+  } else {
+    await db.prepare(`UPDATE users SET full_name = ? WHERE email = ?`).run('Unish Gautam', 'admin@nyora.edu');
   }
 
   isInitialized = true;
