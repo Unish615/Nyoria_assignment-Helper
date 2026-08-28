@@ -8,6 +8,7 @@ import assignmentsRouter from './routes/assignments.js';
 import samplesRouter from './routes/samples.js';
 import questionsRouter from './routes/questions.js';
 import adminRouter from './routes/admin.js';
+import documentsRouter from './routes/documents.js';
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ app.use('/api/assignments', assignmentsRouter);
 app.use('/api/samples', samplesRouter);
 app.use('/api/questions', questionsRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/documents', documentsRouter);
 
 app.get('/api/health', (req, res) => {
   res.json({

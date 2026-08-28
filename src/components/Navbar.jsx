@@ -76,10 +76,17 @@ export const Navbar = () => {
                 Samples
               </Link>
               <Link 
-                to="/question-generator" 
-                className={`px-3 py-2 rounded-lg transition-colors ${isActive('/question-generator') ? 'text-nyora-300 bg-slate-800/80' : 'text-slate-300 hover:text-white hover:bg-slate-900'}`}
+                to="/document-generator" 
+                className={`px-3 py-2 rounded-lg transition-colors flex items-center gap-1.5 ${isActive('/document-generator') ? 'text-nyora-300 bg-slate-800/80' : 'text-slate-300 hover:text-white hover:bg-slate-900'}`}
               >
-                Questions
+                <FileText className="w-4 h-4 text-cyan-400" />
+                <span>PDF Generator</span>
+              </Link>
+              <Link 
+                to="/download-history" 
+                className={`px-3 py-2 rounded-lg transition-colors ${isActive('/download-history') ? 'text-nyora-300 bg-slate-800/80' : 'text-slate-300 hover:text-white hover:bg-slate-900'}`}
+              >
+                History
               </Link>
               {user.role === 'admin' && (
                 <Link 

@@ -25,6 +25,9 @@ import { SettingsPage } from './pages/SettingsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
 
+import { DocumentGeneratorPage } from './pages/DocumentGeneratorPage';
+import { DownloadHistoryPage } from './pages/DownloadHistoryPage';
+
 export function App() {
   return (
     <AuthProvider>
@@ -49,6 +52,8 @@ export function App() {
               <Route path="/my-samples" element={<ProtectedRoute><MySamplesPage /></ProtectedRoute>} />
               <Route path="/question-generator" element={<ProtectedRoute><QuestionGeneratorPage /></ProtectedRoute>} />
               <Route path="/question-papers" element={<ProtectedRoute><QuestionPapersPage /></ProtectedRoute>} />
+              <Route path="/document-generator" element={<ProtectedRoute><DocumentGeneratorPage /></ProtectedRoute>} />
+              <Route path="/download-history" element={<ProtectedRoute><DownloadHistoryPage /></ProtectedRoute>} />
               <Route path="/favorites" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />

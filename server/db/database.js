@@ -7,7 +7,6 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// On Vercel / serverless, filesystem is read-only except /tmp
 const isVercel = process.env.VERCEL || process.env.NODE_ENV === 'production';
 const dataDir = process.env.DATABASE_DIR || (isVercel ? '/tmp' : path.join(__dirname, '..', 'data'));
 
@@ -72,6 +71,7 @@ export async function initDatabase() {
   if (isInitialized) return;
   console.log('Initializing Nyora Database at:', dbPath);
 
+  // Users Table
   await db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
@@ -87,6 +87,7 @@ export async function initDatabase() {
     );
   `);
 
+  // Assignments Table
   await db.exec(`
     CREATE TABLE IF NOT EXISTS assignments (
       id TEXT PRIMARY KEY,
@@ -105,6 +106,7 @@ export async function initDatabase() {
     );
   `);
 
+  // Samples Table
   await db.exec(`
     CREATE TABLE IF NOT EXISTS samples (
       id TEXT PRIMARY KEY,
@@ -119,6 +121,7 @@ export async function initDatabase() {
     );
   `);
 
+  // Question Sets Table
   await db.exec(`
     CREATE TABLE IF NOT EXISTS question_sets (
       id TEXT PRIMARY KEY,
@@ -136,6 +139,7 @@ export async function initDatabase() {
     );
   `);
 
+  // Verification Tokens Table
   await db.exec(`
     CREATE TABLE IF NOT EXISTS verification_tokens (
       token TEXT PRIMARY KEY,
@@ -146,6 +150,7 @@ export async function initDatabase() {
     );
   `);
 
+  // Password Reset Tokens Table
   await db.exec(`
     CREATE TABLE IF NOT EXISTS password_reset_tokens (
       token TEXT PRIMARY KEY,
@@ -157,6 +162,7 @@ export async function initDatabase() {
     );
   `);
 
+  // Dev Email Logs Table
   await db.exec(`
     CREATE TABLE IF NOT EXISTS dev_email_logs (
       id TEXT PRIMARY KEY,
@@ -169,6 +175,38 @@ export async function initDatabase() {
     );
   `);
 
+  // Documents Table (PDF & Question System History)
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS documents (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      title TEXT NOT NULL,
+      document_type TEXT NOT NULL,
+      sample_file_id TEXT,
+      question_file_id TEXT,
+      generated_content TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+  `);
+
+  // Generated Files Table (Download History)
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS generated_files (
+      id TEXT PRIMARY KEY,
+      document_id TEXT NOT NULL,
+      user_id TEXT NOT NULL,
+      format TEXT NOT NULL,
+      file_url TEXT,
+      file_name TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE
+    );
+  `);
+
+  // Seed Admin user
   const existingAdmin = await db.prepare(`SELECT * FROM users WHERE email = ?`).get('admin@nyora.edu');
   if (!existingAdmin) {
     const adminId = 'usr_admin_' + Math.random().toString(36).substr(2, 9);
